@@ -1,0 +1,49 @@
+<!--
+  Proyecto 2 - Mini SOC TiendaCR - Reglas propias de Wazuh (fase 2.5)
+  Ubicación en el SIEM: /var/ossec/etc/rules/local_rules.xml
+  Rango de ID propio: 100100 - 100199
+  No necesita decodificador propio: los logs de Apache usan el decodificador
+  "web-accesslog" incluido en Wazuh y las alertas de Suricata el decodificador "json".
+-->
+<group name="tiendacr,">
+
+  <!-- Ataque 2: cada intento de login contra el módulo Brute Force de DVWA -->
+  <rule id="100100" level="3">
+    <if_sid>31100</if_sid>
+    <url>/vulnerabilities/brute/</url>
+    <match>password=</match>
+    <description>TiendaCR: intento de inicio de sesion en la aplicacion web desde $(srcip)</description>
+    <group>authentication_failed,web,</group>
+  </rule>
+
+  <!-- Ataque 2: 10 intentos o más en 60 s desde la misma IP = fuerza bruta -->
+  <rule id="100101" level="10" frequency="10" timeframe="60">
+    <if_matched_sid>100100</if_matched_sid>
+    <same_srcip />
+    <description>TiendaCR: fuerza bruta contra el login web desde $(srcip) (10+ intentos en 60 s)</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+    <group>authentication_failures,attack,pci_dss_11.4,</group>
+  </rule>
+
+  <!-- Ataque 4: archivo PHP nuevo en el directorio de cargas = posible webshell -->
+  <rule id="100110" level="12">
+    <if_sid>554</if_sid>
+    <field name="file">/var/www/dvwa/hackable/uploads/\.+\.php</field>
+    <description>TiendaCR: posible webshell PHP creada en el directorio de cargas: $(file)</description>
+    <mitre>
+      <id>T1505.003</id>
+    </mitre>
+    <group>syscheck,webshell,attack,</group>
+  </rule>
+
+  <!-- Ataques 1-4: elevar el nivel de las alertas de las reglas propias de Suricata -->
+  <rule id="100120" level="10">
+    <if_sid>86601</if_sid>
+    <field name="alert.signature_id">^10000\d\d$</field>
+    <description>TiendaCR Suricata (regla propia): $(alert.signature) desde $(src_ip)</description>
+    <group>ids,tiendacr_suricata,</group>
+  </rule>
+
+</group>

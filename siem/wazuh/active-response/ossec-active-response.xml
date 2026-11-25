@@ -1,0 +1,30 @@
+<!--
+  Proyecto 2 - Mini SOC TiendaCR - Respuesta automática (fase 2.6)
+  Se agrega a /var/ossec/etc/ossec.conf del SIEM.
+
+  firewall-drop inserta en el agente:  iptables -I INPUT  -s <IP> -j DROP
+                                       iptables -I FORWARD -s <IP> -j DROP
+  La regla en FORWARD es la que corta el tráfico hacia el contenedor DVWA,
+  porque Docker publica el puerto 80 por FORWARD y no por INPUT.
+
+  Disparadores:
+    100101 = fuerza bruta contra el login web (regla propia)
+    5712   = fuerza bruta SSH (usuarios inexistentes)    - regla incluida en Wazuh
+    5763   = fuerza bruta SSH (múltiples fallos)          - regla incluida en Wazuh
+  El bloqueo es temporal (180 s) para limitar el daño de un falso positivo.
+-->
+<ossec_config>
+  <active-response>
+    <disabled>no</disabled>
+    <command>firewall-drop</command>
+    <location>local</location>
+    <rules_id>100101,5712,5763</rules_id>
+    <timeout>180</timeout>
+  </active-response>
+</ossec_config>
+
+<!--
+  Lista blanca (dentro de <global> en ossec.conf): la IP de administración
+  nunca se bloquea, para no perder el acceso al laboratorio.
+    <white_list>192.168.56.1</white_list>
+-->
