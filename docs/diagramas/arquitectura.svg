@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 560" font-family="Segoe UI, Arial, sans-serif">
+  <rect x="0" y="0" width="920" height="560" fill="#ffffff"/>
+  <text x="460" y="34" text-anchor="middle" font-size="22" font-weight="700" fill="#1a2b45">Mini SOC TiendaCR — Arquitectura del laboratorio</text>
+  <text x="460" y="56" text-anchor="middle" font-size="13" fill="#5a6b7f">Red solo-anfitrión (host-only) 192.168.56.0/24 — aislada de Internet</text>
+
+  <!-- Network bus -->
+  <rect x="60" y="300" width="800" height="26" rx="6" fill="#e8eef7" stroke="#9db4d4"/>
+  <text x="460" y="318" text-anchor="middle" font-size="13" font-weight="600" fill="#33506f">LAN host-only  ·  enp0s8  ·  192.168.56.0/24</text>
+
+  <!-- Admin laptop -->
+  <g>
+    <rect x="80" y="110" width="200" height="110" rx="10" fill="#fef6e7" stroke="#e0a93b" stroke-width="2"/>
+    <text x="180" y="138" text-anchor="middle" font-size="15" font-weight="700" fill="#8a5a00">Laptop de administración</text>
+    <text x="180" y="160" text-anchor="middle" font-size="12" fill="#5a4a2a">Windows 11 · 192.168.56.1</text>
+    <text x="180" y="182" text-anchor="middle" font-size="11" fill="#5a4a2a">Navegador (panel Wazuh)</text>
+    <text x="180" y="199" text-anchor="middle" font-size="11" fill="#5a4a2a">Cliente SSH · host VirtualBox</text>
+  </g>
+
+  <!-- Kali -->
+  <g>
+    <rect x="360" y="110" width="200" height="110" rx="10" fill="#fdeaea" stroke="#d05454" stroke-width="2"/>
+    <text x="460" y="138" text-anchor="middle" font-size="15" font-weight="700" fill="#a12b2b">Kali — Atacante</text>
+    <text x="460" y="160" text-anchor="middle" font-size="12" fill="#6b2f2f">192.168.56.30</text>
+    <text x="460" y="182" text-anchor="middle" font-size="11" fill="#6b2f2f">nmap · Hydra · curl</text>
+    <text x="460" y="199" text-anchor="middle" font-size="11" fill="#6b2f2f">Ataques autorizados</text>
+  </g>
+
+  <!-- SIEM -->
+  <g>
+    <rect x="640" y="110" width="200" height="110" rx="10" fill="#e9f3ec" stroke="#4a9e68" stroke-width="2"/>
+    <text x="740" y="138" text-anchor="middle" font-size="15" font-weight="700" fill="#256b40">SIEM — Wazuh</text>
+    <text x="740" y="160" text-anchor="middle" font-size="12" fill="#2f5a3f">siem-tiendacr · 192.168.56.20</text>
+    <text x="740" y="182" text-anchor="middle" font-size="11" fill="#2f5a3f">manager · indexer · dashboard</text>
+    <text x="740" y="199" text-anchor="middle" font-size="11" fill="#2f5a3f">Respuesta activa · FIM · CVE</text>
+  </g>
+
+  <!-- Target -->
+  <g>
+    <rect x="360" y="380" width="200" height="130" rx="10" fill="#e8eef7" stroke="#3f6aa8" stroke-width="2"/>
+    <text x="460" y="408" text-anchor="middle" font-size="15" font-weight="700" fill="#274b7a">Objetivo — web-tiendacr</text>
+    <text x="460" y="430" text-anchor="middle" font-size="12" fill="#2f4c70">Ubuntu Server · 192.168.56.10</text>
+    <text x="460" y="452" text-anchor="middle" font-size="11" fill="#2f4c70">Docker + DVWA (puerto 80)</text>
+    <text x="460" y="469" text-anchor="middle" font-size="11" fill="#2f4c70">Suricata (IDS de red)</text>
+    <text x="460" y="486" text-anchor="middle" font-size="11" fill="#2f4c70">Agente Wazuh (logs · FIM)</text>
+  </g>
+
+  <!-- connectors to bus -->
+  <line x1="180" y1="220" x2="180" y2="300" stroke="#9db4d4" stroke-width="2"/>
+  <line x1="460" y1="220" x2="460" y2="300" stroke="#9db4d4" stroke-width="2"/>
+  <line x1="740" y1="220" x2="740" y2="300" stroke="#9db4d4" stroke-width="2"/>
+  <line x1="460" y1="326" x2="460" y2="380" stroke="#9db4d4" stroke-width="2"/>
+
+  <!-- Attack flow Kali -> Target -->
+  <path d="M 440 220 C 420 270, 420 330, 440 380" fill="none" stroke="#d05454" stroke-width="2.5" stroke-dasharray="6 4" marker-end="url(#ar)"/>
+  <text x="372" y="300" font-size="11" font-weight="600" fill="#a12b2b">ataques → :80</text>
+
+  <!-- Agent -> SIEM -->
+  <path d="M 540 400 C 700 380, 760 300, 760 230" fill="none" stroke="#4a9e68" stroke-width="2.5" marker-end="url(#ag)"/>
+  <text x="648" y="360" font-size="11" font-weight="600" fill="#256b40">agente → SIEM :1514/1515</text>
+
+  <!-- Admin -> SIEM (443) -->
+  <path d="M 230 150 C 500 70, 640 90, 700 110" fill="none" stroke="#8a5a00" stroke-width="2" marker-end="url(#aa)"/>
+  <text x="470" y="92" font-size="11" font-weight="600" fill="#8a5a00">panel Wazuh :443</text>
+
+  <defs>
+    <marker id="ar" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#d05454"/></marker>
+    <marker id="ag" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4a9e68"/></marker>
+    <marker id="aa" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#8a5a00"/></marker>
+  </defs>
+
+  <!-- legend -->
+  <rect x="60" y="524" width="800" height="28" rx="6" fill="#f6f8fb" stroke="#dde5ef"/>
+  <text x="72" y="542" font-size="11" fill="#33506f">Firewall deny-by-default: SSH :22 solo desde .1  ·  DVWA :80 solo .1 y .30  ·  panel :443 solo .1  ·  agente :1514/1515 solo desde .10</text>
+</svg>
