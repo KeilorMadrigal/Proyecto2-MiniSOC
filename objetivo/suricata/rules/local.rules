@@ -1,0 +1,21 @@
+# =============================================================================
+# Proyecto 2 - Mini SOC TiendaCR - Reglas propias de Suricata (fase 2.5)
+# Ubicación en el servidor: /etc/suricata/rules/local.rules
+# Rango de SID propio: 1000001 - 1000099
+# =============================================================================
+
+# Ataque 1 - Reconocimiento: muchos SYN desde un mismo origen en poco tiempo
+# MITRE ATT&CK T1046 (Network Service Discovery)
+alert tcp any any -> $HOME_NET any (msg:"TiendaCR - Escaneo de puertos SYN (posible nmap)"; flow:stateless; flags:S,12; threshold:type both, track by_src, count 20, seconds 5; classtype:attempted-recon; sid:1000001; rev:1; metadata:mitre_technique_id T1046;)
+
+# Ataque 2 - Fuerza bruta contra el login de la aplicación (módulo Brute Force de DVWA)
+# MITRE ATT&CK T1110.001 (Password Guessing)
+alert http any any -> $HOME_NET 80 (msg:"TiendaCR - Fuerza bruta contra login web"; flow:established,to_server; http.uri; content:"/vulnerabilities/brute/"; nocase; content:"password="; nocase; threshold:type both, track by_src, count 10, seconds 60; classtype:attempted-user; sid:1000002; rev:1; metadata:mitre_technique_id T1110.001;)
+
+# Ataque 3 - Inyección SQL en el parámetro id (UNION SELECT u OR 1=1)
+# MITRE ATT&CK T1190 (Exploit Public-Facing Application)
+alert http any any -> $HOME_NET 80 (msg:"TiendaCR - Inyeccion SQL en parametro id"; flow:established,to_server; http.uri; content:"/vulnerabilities/sqli"; nocase; content:"id="; nocase; pcre:"/(union[\s+]+(all[\s+]+)?select|'[\s+]*or[\s+]*'?\d+'?[\s+]*=[\s+]*'?\d+)/i"; classtype:web-application-attack; sid:1000003; rev:1; metadata:mitre_technique_id T1190;)
+
+# Ataque 4 - Uso de una webshell subida al directorio de cargas
+# MITRE ATT&CK T1505.003 (Server Software Component: Web Shell)
+alert http any any -> $HOME_NET 80 (msg:"TiendaCR - Ejecucion de comandos via webshell en uploads"; flow:established,to_server; http.uri; content:"/hackable/uploads/"; nocase; content:".php"; nocase; content:"cmd="; nocase; classtype:trojan-activity; sid:1000004; rev:1; metadata:mitre_technique_id T1505.003;)
